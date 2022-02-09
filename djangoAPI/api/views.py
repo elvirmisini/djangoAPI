@@ -139,5 +139,10 @@ def EditTask(request,pk):
 #     success_url = reverse_lazy('home')
 
 def DeleteTask(request, pk):
-    requests.delete(url=f'http://127.0.0.1:8000/task/{pk}/')
-    return redirect("home")
+    # requests.delete(url=f'http://127.0.0.1:8000/task/{pk}/')
+    # return redirect("home")
+
+    if request.is_ajax():
+        requests.delete(url=f'http://127.0.0.1:8000/task/{pk}/')
+        return JsonResponse({"message": "success"})
+    return JsonResponse({"message": "Wrong request"})

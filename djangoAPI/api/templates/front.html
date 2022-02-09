@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Front</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+</html>
+
     <style>
         body{
         background-color:#202124;
@@ -41,7 +45,7 @@
         <tbody>
     {% for task in tasks %}
     <div class="task">
-        <tr>
+        <tr class="record">
             <td>
             <h4>- {{ task.title }}</h4>
             </td>
@@ -49,7 +53,7 @@
             <a class="btn btn-primary" href="{%url 'EditTask' task.pk%}">Edit</a>
             </td>
             <td>
-            <a class="btn btn-danger" href="{%url 'DeleteTask' task.pk%}">Delete</a>
+            <a class="btn btn-danger link-delete" href="{%url 'DeleteTask' task.pk%}">Delete</a>
             </td>
         </tr>
     </div>
@@ -61,5 +65,33 @@
 <p>{{ content }}</p>
 {%endblock%}
     </center>
+{% block scripts %}
+
+<script>
+$(".link-delete").on("click", function(e){
+    e.preventDefault();
+    var $this = $(this);
+    if(confirm("Sure to delete?")){
+        $.ajax({
+            url: $this.attr("href"),
+            type: "GET",
+            dataType: "json",
+            success: function(resp){
+                if(resp.message == "success"){
+                    $this.parents(".record").fadeOut("slow", function(){
+                        $this.parents(".record").remove();
+                    });
+                }else{
+                    alert(resp.message);
+                }
+            }
+        });
+    }
+    return false;
+});
+</script>
+
+{% endblock scripts %}
+
 </body>
 </html>
