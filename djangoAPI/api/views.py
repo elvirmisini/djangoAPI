@@ -1,8 +1,8 @@
-import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser, FormParser
+from rest_framework.renderers import JSONRenderer
 from .models import Task
 from .serializers import TaskSerializer
 from datetime import date
@@ -10,7 +10,7 @@ from .forms import CreateTask
 from django.views.generic import CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
 import requests
-# Create your views here.
+
 @csrf_exempt
 def task_list(request):
 
@@ -81,7 +81,6 @@ def task_delete(request, pk):
         return deletedOne
     return HttpResponse(status=204)
 
-
 @csrf_exempt
 def task_today(request):
         tasks = Task.objects.filter(date__date=date.today())
@@ -97,7 +96,6 @@ def report(request):
         tasks = Task.objects.all()
         return render(request,'report.html',{'tasks':tasks})
 
-
 # class AddTask(CreateView):
 #     model = Task
 #     template_name = 'addTask.html'
@@ -108,14 +106,14 @@ def AddTask(request):
 
         if request.method=='POST':
             title=request.POST.get('title')
-
             if title:
-                Task.objects.create(title=title)
+                data = FormParser().parse(request)
+                data = JSONRenderer().render(data)
+                requests.post(url=f'http://127.0.0.1:8000/task/',data=data)
                 return redirect('home')
 
         tasks=Task.objects.filter(is_done=False)
         return render(request,'front.html',{'tasks':tasks})
-
 # class EditTask(UpdateView):
 #         model = Task
 #         template_name = 'edit.html'
@@ -126,6 +124,7 @@ def EditTask(request,pk):
     pk = Task.objects.get(pk=pk)
     if request.method == "POST":
         form = CreateTask(request.POST, instance=pk)
+        requests.post(url=f'http://127.0.0.1:8000/task/{pk}/update/')
         if form.is_valid():
             form.save()
             return redirect("home")
@@ -140,8 +139,5 @@ def EditTask(request,pk):
 #     success_url = reverse_lazy('home')
 
 def DeleteTask(request, pk):
-
-    # task = Task.objects.get(pk=pk)
-    # task.delete()
     requests.delete(url=f'http://127.0.0.1:8000/task/{pk}/')
     return redirect("home")
