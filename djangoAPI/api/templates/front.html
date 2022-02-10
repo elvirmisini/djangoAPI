@@ -7,7 +7,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 </html>
-
     <style>
         body{
         background-color:#202124;
@@ -47,10 +46,10 @@
     <div class="task">
         <tr class="record">
             <td>
-            <h4>- {{ task.title }}</h4>
+            <h4> {{ task.title }}</h4>
             </td>
             <td>
-            <a class="btn btn-primary" href="{%url 'EditTask' task.pk%}">Edit</a>
+            <a class="btn btn-primary link-edit"  data-bs-id="{{ task.pk }}" href="{%url 'EditTask' task.pk%}">Edit</a>
             </td>
             <td>
             <a class="btn btn-danger link-delete" href="{%url 'DeleteTask' task.pk%}">Delete</a>
@@ -61,36 +60,39 @@
         </tbody>
     </table>
 </div>
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formEdit" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group validate">
+                        <input type="text" name="title" class="form-control" placeholder="Enter title">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                    <button type="submit" id="update" class="btn btn-primary btnUpdate" >Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
             <br><form action="/report"><button class="btn btn-warning">Generate Report</button></form>
 <p>{{ content }}</p>
 {%endblock%}
     </center>
 {% block scripts %}
-
-<script>
-$(".link-delete").on("click", function(e){
-    e.preventDefault();
-    var $this = $(this);
-    if(confirm("Sure to delete?")){
-        $.ajax({
-            url: $this.attr("href"),
-            type: "GET",
-            dataType: "json",
-            success: function(resp){
-                if(resp.message == "success"){
-                    $this.parents(".record").fadeOut("slow", function(){
-                        $this.parents(".record").remove();
-                    });
-                }else{
-                    alert(resp.message);
-                }
-            }
-        });
-    }
-    return false;
-});
+<script type="text/javascript" src="static/JSFiles/delete.js"></script>
+<script type="text/javascript" src="static/JSFiles/edit.js"></script>
+ <script type="text/javascript">
 </script>
-
 {% endblock scripts %}
 
 </body>

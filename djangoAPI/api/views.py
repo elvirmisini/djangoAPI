@@ -121,7 +121,8 @@ def AddTask(request):
 
 def EditTask(request,pk):
 
-    pk = Task.objects.get(pk=pk)
+  pk = Task.objects.get(pk=pk)
+  if request.is_ajax():
     if request.method == "POST":
         form = CreateTask(request.POST, instance=pk)
         requests.post(url=f'http://127.0.0.1:8000/task/{pk}/update/')
@@ -131,7 +132,7 @@ def EditTask(request,pk):
     else:
         form = CreateTask(instance=pk)
         return render(request, 'edit.html', {'form': form})
-
+  return JsonResponse({'message': 'Wrong request'})
 # class DeleteTask(DeleteView):
 #     model = Task
 #     template_name = 'delete.html'
@@ -144,5 +145,5 @@ def DeleteTask(request, pk):
 
     if request.is_ajax():
         requests.delete(url=f'http://127.0.0.1:8000/task/{pk}/')
-        return JsonResponse({"message": "success"})
-    return JsonResponse({"message": "Wrong request"})
+        return JsonResponse({'message': 'success'})
+    return JsonResponse({'message': 'Wrong request'})
