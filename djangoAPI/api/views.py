@@ -10,6 +10,7 @@ from .forms import CreateTask
 from django.views.generic import CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
 import requests
+from django.shortcuts import HttpResponse
 
 @csrf_exempt
 def task_list(request):
@@ -138,12 +139,14 @@ def EditTask(request,pk):
 #     template_name = 'delete.html'
 #     fields = ['title']
 #     success_url = reverse_lazy('home')
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 def DeleteTask(request, pk):
     # requests.delete(url=f'http://127.0.0.1:8000/task/{pk}/')
     # return redirect("home")
 
-    if request.is_ajax():
+    if is_ajax(request=request):
         requests.delete(url=f'http://127.0.0.1:8000/task/{pk}/')
         return JsonResponse({'message': 'success'})
     return JsonResponse({'message': 'Wrong request'})
